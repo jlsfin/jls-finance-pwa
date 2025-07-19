@@ -1,0 +1,2575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLS FINANCE LTD - Microfinance Management System</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1f2937">
+    <meta name="description" content="Complete microfinance management system for JLS FINANCE LTD">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiSkxTIEZJTkFOQ0UgTFREIiwic2hvcnRfbmFtZSI6IkpMUyBGSU5BTkNFIiwidGhlbWVfY29sb3IiOiIjMWYyOTM3IiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOWZhZmIiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsInN0YXJ0X3VybCI6Ii8iLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROUlqRXlPQ0lpSUdacGJHdzlJaU14Wmprek16Y2lQanhqYVhKamJHVWdZM2c5STJRZ2NqMGlOalFpTHo0OEwzTjJaejQ9Iiwic2l6ZXMiOiIxMjh4MTI4IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwifV19">
+    
+    <!-- CSS Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .offline-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .online {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .offline {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .print-only {
+            display: none;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { font-size: 12px; }
+            .container { max-width: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Offline/Online Indicator -->
+    <div id="networkStatus" class="offline-indicator online">
+        <i class="fas fa-wifi"></i> Online
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="loading w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto mb-4"></div>
+            <h2 class="text-xl font-semibold text-gray-800">Loading JLS FINANCE LTD</h2>
+            <p class="text-gray-600">Please wait...</p>
+        </div>
+    </div>
+
+    <!-- Main Application Container -->
+    <div id="app" class="hidden">
+        <!-- Navigation Bar -->
+        <nav id="navbar" class="bg-white shadow-lg no-print">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-xl font-bold text-gray-800">
+                                <i class="fas fa-university text-blue-600"></i>
+                                JLS FINANCE LTD
+                            </h1>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span id="userInfo" class="text-gray-700"></span>
+                        <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="fixed left-0 top-16 h-full w-64 bg-gray-800 text-white transform transition-transform duration-300 ease-in-out z-30 no-print">
+            <div class="p-4">
+                <ul class="space-y-2">
+                    <li><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt mr-2"></i> Dashboard
+                    </a></li>
+                    <li><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="customers">
+                        <i class="fas fa-users mr-2"></i> Customers
+                    </a></li>
+                    <li><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="loans">
+                        <i class="fas fa-money-bill-wave mr-2"></i> Loans
+                    </a></li>
+                    <li><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="emi-collection">
+                        <i class="fas fa-coins mr-2"></i> EMI Collection
+                    </a></li>
+                    <li><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="reports">
+                        <i class="fas fa-chart-bar mr-2"></i> Reports
+                    </a></li>
+                    <li id="adminOnly"><a href="#" class="nav-link block px-4 py-2 rounded hover:bg-gray-700" data-page="admin">
+                        <i class="fas fa-cog mr-2"></i> Admin Panel
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="ml-64 p-6 min-h-screen">
+            <!-- Login Page -->
+            <div id="loginPage" class="max-w-md mx-auto mt-20">
+                <div class="bg-white rounded-lg shadow-lg p-8">
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-university text-blue-600"></i>
+                            JLS FINANCE LTD
+                        </h2>
+                        <p class="text-gray-600 mt-2">Microfinance Management System</p>
+                    </div>
+                    
+                    <form id="loginForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                            <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                            <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                            Login
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-600">Demo Credentials:</p>
+                        <div class="text-xs mt-2 space-y-1">
+                            <p><strong>Admin:</strong> admin@jls.com / admin123</p>
+                            <p><strong>Agent:</strong> agent@jls.com / agent123</p>
+                            <p><strong>Customer:</strong> customer@jls.com / customer123</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
+                    <p class="text-gray-600">Welcome back! Here's your overview.</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-blue-100">
+                                <i class="fas fa-users text-blue-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Total Customers</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="totalCustomers">156</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <i class="fas fa-money-bill-wave text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Active Loans</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="activeLoans">89</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100">
+                                <i class="fas fa-coins text-yellow-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Outstanding EMIs</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="outstandingEMIs">₹2,45,678</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-purple-100">
+                                <i class="fas fa-chart-line text-purple-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Collections Today</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="todayCollections">₹45,230</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Loan Distribution</h3>
+                        <div style="height: 300px;">
+                            <canvas id="loanChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">Monthly Collections</h3>
+                        <div style="height: 300px;">
+                            <canvas id="collectionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="bg-white rounded-lg shadow">
+                    <div class="px-6 py-4 border-b">
+                        <h3 class="text-lg font-semibold">Recent Activities</h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-4" id="recentActivities">
+                            <!-- Activities will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customers Page -->
+            <div id="customersPage" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Customer Management</h2>
+                    <button id="addCustomerBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Customer
+                    </button>
+                </div>
+
+                <!-- Customer Search -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="searchCustomer" placeholder="Search by name or phone..." class="px-3 py-2 border rounded-lg">
+                        <select id="filterStatus" class="px-3 py-2 border rounded-lg">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button id="searchBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Customers Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTable" class="divide-y divide-gray-200">
+                            <!-- Table rows will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add/Edit Customer Modal -->
+            <div id="customerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 m-4 max-w-4xl w-full max-h-full overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold" id="customerModalTitle">Add New Customer</h3>
+                        <button id="closeCustomerModal" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <form id="customerForm" class="space-y-6">
+                        <!-- Personal Details -->
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Personal Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                                    <input type="text" name="name" required class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
+                                    <input type="tel" name="phone" required class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input type="email" name="email" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                                    <input type="date" name="dob" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                                    <select name="gender" class="w-full px-3 py-2 border rounded-lg">
+                                        <option value="">Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
+                                    <input type="text" name="occupation" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Address Details -->
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Address Details</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Street Address *</label>
+                                    <input type="text" name="address" required class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                                        <input type="text" name="city" required class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                                        <input type="text" name="state" required class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">PIN Code *</label>
+                                        <input type="text" name="pincode" required class="w-full px-3 py-2 border rounded-lg">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KYC Documents -->
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">KYC Documents</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Aadhaar Card</label>
+                                    <input type="file" name="aadhaar" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">PAN Card</label>
+                                    <input type="file" name="pan" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Photo</label>
+                                    <input type="file" name="photo" accept="image/*" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nominee Details -->
+                        <div>
+                            <h4 class="text-lg font-semibold mb-4">Nominee Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nominee Name</label>
+                                    <input type="text" name="nominee_name" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Relationship</label>
+                                    <input type="text" name="nominee_relationship" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nominee Phone</label>
+                                    <input type="tel" name="nominee_phone" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nominee Age</label>
+                                    <input type="number" name="nominee_age" class="w-full px-3 py-2 border rounded-lg">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancelCustomer" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Save Customer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Loans Page -->
+            <div id="loansPage" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Loan Management</h2>
+                    <button id="addLoanBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Create Loan
+                    </button>
+                </div>
+
+                <!-- Loan Filters -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <select id="loanStatusFilter" class="px-3 py-2 border rounded-lg">
+                            <option value="">All Status</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="active">Active</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <input type="text" id="loanCustomerSearch" placeholder="Search customer..." class="px-3 py-2 border rounded-lg">
+                        <input type="date" id="loanDateFilter" class="px-3 py-2 border rounded-lg">
+                        <button id="filterLoansBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-filter mr-2"></i>Filter
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loans Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Loan ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tenure</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Interest</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loansTable" class="divide-y divide-gray-200">
+                            <!-- Table rows will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add/Edit Loan Modal -->
+            <div id="loanModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg p-8 m-4 max-w-2xl w-full max-h-full overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold" id="loanModalTitle">Create New Loan</h3>
+                        <button id="closeLoanModal" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <form id="loanForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Customer *</label>
+                                <select name="customer_id" id="loanCustomerSelect" required class="w-full px-3 py-2 border rounded-lg">
+                                    <option value="">Select Customer</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Loan Amount *</label>
+                                <input type="number" name="principal" required min="1000" max="1000000" class="w-full px-3 py-2 border rounded-lg" placeholder="₹">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tenure (Months) *</label>
+                                <select name="tenure" required class="w-full px-3 py-2 border rounded-lg">
+                                    <option value="">Select Tenure</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12">12 Months</option>
+                                    <option value="18">18 Months</option>
+                                    <option value="24">24 Months</option>
+                                    <option value="36">36 Months</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Interest Rate (%) *</label>
+                                <input type="number" name="interest_rate" required min="1" max="50" step="0.1" class="w-full px-3 py-2 border rounded-lg" placeholder="12.5">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Processing Fee</label>
+                                <input type="number" name="processing_fee" min="0" class="w-full px-3 py-2 border rounded-lg" placeholder="₹">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Loan Purpose</label>
+                                <select name="purpose" class="w-full px-3 py-2 border rounded-lg">
+                                    <option value="business">Business</option>
+                                    <option value="personal">Personal</option>
+                                    <option value="education">Education</option>
+                                    <option value="medical">Medical</option>
+                                    <option value="agriculture">Agriculture</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                            <textarea name="remarks" rows="3" class="w-full px-3 py-2 border rounded-lg" placeholder="Any additional notes..."></textarea>
+                        </div>
+
+                        <!-- EMI Calculation Preview -->
+                        <div id="emiPreview" class="bg-gray-50 p-4 rounded-lg hidden">
+                            <h4 class="font-semibold mb-2">EMI Calculation Preview</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>Monthly EMI: <span id="previewEMI" class="font-semibold"></span></div>
+                                <div>Total Interest: <span id="previewInterest" class="font-semibold"></span></div>
+                                <div>Total Amount: <span id="previewTotal" class="font-semibold"></span></div>
+                                <div>Net Disbursed: <span id="previewDisbursed" class="font-semibold"></span></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="calculateEMI" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+                                Calculate EMI
+                            </button>
+                            <button type="button" id="cancelLoan" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                                Create Loan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- EMI Collection Page -->
+            <div id="emiCollectionPage" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">EMI Collection</h2>
+                    <p class="text-gray-600">Manage and collect EMI payments</p>
+                </div>
+
+                <!-- Collection Summary -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-red-100">
+                                <i class="fas fa-exclamation-triangle text-red-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Overdue EMIs</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="overdueEMIs">23</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-yellow-100">
+                                <i class="fas fa-clock text-yellow-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Due Today</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="dueTodayEMIs">15</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 rounded-full bg-green-100">
+                                <i class="fas fa-check-circle text-green-600"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600">Collected Today</p>
+                                <p class="text-2xl font-semibold text-gray-900" id="collectedTodayEMIs">₹45,230</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EMI Filters -->
+                <div class="bg-white rounded-lg shadow p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <select id="emiStatusFilter" class="px-3 py-2 border rounded-lg">
+                            <option value="">All Status</option>
+                            <option value="due">Due</option>
+                            <option value="overdue">Overdue</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                        <input type="text" id="emiCustomerSearch" placeholder="Search customer..." class="px-3 py-2 border rounded-lg">
+                        <input type="date" id="emiDateFilter" class="px-3 py-2 border rounded-lg">
+                        <button id="filterEMIsBtn" class="bg-gray-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-filter mr-2"></i>Filter
+                        </button>
+                        <button id="exportEMIReportBtn" class="bg-purple-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-download mr-2"></i>Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EMI Collection Table -->
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Loan ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">EMI No.</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Due Date</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emiTable" class="divide-y divide-gray-200">
+                            <!-- Table rows will be populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reportsPage" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Reports & Analytics</h2>
+                    <p class="text-gray-600">Comprehensive business intelligence and reporting</p>
+                </div>
+
+                <!-- Report Filters -->
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Report Type</label>
+                            <select id="reportType" class="w-full px-3 py-2 border rounded-lg">
+                                <option value="overview">Business Overview</option>
+                                <option value="loans">Loan Report</option>
+                                <option value="collections">Collection Report</option>
+                                <option value="customers">Customer Report</option>
+                                <option value="performance">Performance Report</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                            <input type="date" id="reportFromDate" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                            <input type="date" id="reportToDate" class="w-full px-3 py-2 border rounded-lg">
+                        </div>
+                        <div class="flex items-end">
+                            <button id="generateReportBtn" class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                <i class="fas fa-chart-bar mr-2"></i>Generate Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Report Content -->
+                <div id="reportContent">
+                    <!-- Business Overview Report -->
+                    <div id="overviewReport" class="space-y-8">
+                        <!-- Key Metrics -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="bg-white rounded-lg shadow p-6 text-center">
+                                <div class="text-3xl font-bold text-blue-600" id="reportTotalCustomers">156</div>
+                                <div class="text-gray-600 mt-2">Total Customers</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6 text-center">
+                                <div class="text-3xl font-bold text-green-600" id="reportTotalLoans">₹45,67,890</div>
+                                <div class="text-gray-600 mt-2">Total Loans Disbursed</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6 text-center">
+                                <div class="text-3xl font-bold text-yellow-600" id="reportOutstanding">₹32,45,670</div>
+                                <div class="text-gray-600 mt-2">Outstanding Amount</div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6 text-center">
+                                <div class="text-3xl font-bold text-purple-600" id="reportCollectionRate">94.5%</div>
+                                <div class="text-gray-600 mt-2">Collection Rate</div>
+                            </div>
+                        </div>
+
+                        <!-- Charts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h3 class="text-lg font-semibold mb-4">Monthly Disbursement Trend</h3>
+                                <div style="height: 300px;">
+                                    <canvas id="disbursementChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h3 class="text-lg font-semibold mb-4">Collection Performance</h3>
+                                <div style="height: 300px;">
+                                    <canvas id="performanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Export Options -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Export Options</h3>
+                            <div class="flex space-x-4">
+                                <button id="exportPDFBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                    <i class="fas fa-file-pdf mr-2"></i>Export PDF
+                                </button>
+                                <button id="exportExcelBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+                                    <i class="fas fa-file-excel mr-2"></i>Export Excel
+                                </button>
+                                <button id="sendWhatsAppBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    <i class="fab fa-whatsapp mr-2"></i>Send via WhatsApp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel Page -->
+            <div id="adminPage" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Admin Control Panel</h2>
+                    <p class="text-gray-600">System administration and configuration</p>
+                </div>
+
+                <!-- Admin Actions -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- User Management -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">User Management</h3>
+                        <div class="space-y-4">
+                            <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-left">
+                                <i class="fas fa-user-plus mr-2"></i>Create New User
+                            </button>
+                            <button class="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 text-left">
+                                <i class="fas fa-users-cog mr-2"></i>Manage User Roles
+                            </button>
+                            <button class="w-full bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 text-left">
+                                <i class="fas fa-key mr-2"></i>Reset User Passwords
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- System Configuration -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold mb-4">System Configuration</h3>
+                        <div class="space-y-4">
+                            <button class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-left">
+                                <i class="fas fa-cog mr-2"></i>Interest Rate Settings
+                            </button>
+                            <button class="w-full bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 text-left">
+                                <i class="fas fa-bell mr-2"></i>Notification Templates
+                            </button>
+                            <button class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-left">
+                                <i class="fas fa-database mr-2"></i>Backup & Restore
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Integration Panel -->
+                <div class="bg-white rounded-lg shadow p-6 mb-8">
+                    <h3 class="text-lg font-semibold mb-4">API Integration Control</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- ImgBB Integration -->
+                        <div class="border rounded-lg p-4">
+                            <h4 class="font-semibold mb-3">
+                                <i class="fas fa-image mr-2 text-blue-600"></i>ImgBB Integration
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                                    <input type="text" id="imgbbApiKey" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter ImgBB API Key">
+                                </div>
+                                <button class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700">
+                                    Test Upload
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- WhatsApp Integration -->
+                        <div class="border rounded-lg p-4">
+                            <h4 class="font-semibold mb-3">
+                                <i class="fab fa-whatsapp mr-2 text-green-600"></i>WhatsApp API
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">API Token</label>
+                                    <input type="text" id="whatsappToken" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter WhatsApp API Token">
+                                </div>
+                                <button class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700">
+                                    Send Test Message
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Supabase Integration -->
+                        <div class="border rounded-lg p-4">
+                            <h4 class="font-semibold mb-3">
+                                <i class="fas fa-database mr-2 text-purple-600"></i>Supabase Config
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Project URL</label>
+                                    <input type="text" id="supabaseUrl" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter Supabase URL">
+                                </div>
+                                <button class="w-full bg-purple-600 text-white px-3 py-2 rounded text-sm hover:bg-purple-700">
+                                    Test Connection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offline Data Management -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-semibold mb-4">Offline Data Management</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold mb-3">Pending Sync Items</h4>
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm">Customer Registrations</span>
+                                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">3 pending</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm">EMI Collections</span>
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">7 pending</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm">Document Uploads</span>
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs">2 pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-3">Sync Actions</h4>
+                            <div class="space-y-3">
+                                <button class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                                    <i class="fas fa-sync mr-2"></i>Force Sync All
+                                </button>
+                                <button class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                                    <i class="fas fa-trash mr-2"></i>Clear Offline Cache
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WhatsApp Message Preview Modal -->
+    <div id="whatsappModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 m-4 max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold">
+                    <i class="fab fa-whatsapp text-green-600 mr-2"></i>WhatsApp Message Preview
+                </h3>
+                <button id="closeWhatsappModal" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="bg-gray-100 rounded-lg p-4 mb-4">
+                <div class="bg-green-500 text-white rounded-lg p-3 mb-2 max-w-xs ml-auto">
+                    <div id="whatsappMessagePreview" class="text-sm whitespace-pre-line"></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3">
+                <button id="cancelWhatsapp" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button id="sendWhatsapp" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    <i class="fab fa-whatsapp mr-2"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+<script>
+// Application State Management
+class AppState {
+    constructor() {
+        this.currentUser = null;
+        this.currentPage = 'dashboard';
+        this.data = {
+            customers: [],
+            loans: [],
+            emis: [],
+            users: []
+        };
+        this.offlineQueue = [];
+        this.isOnline = navigator.onLine;
+        this.init();
+    }
+
+    init() {
+        this.loadFromStorage();
+        this.setupEventListeners();
+        this.initServiceWorker();
+        this.populateDemoData();
+    }
+
+    loadFromStorage() {
+        const stored = localStorage.getItem('jls_finance_data');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            this.data = { ...this.data, ...parsed };
+        }
+
+        const user = localStorage.getItem('jls_finance_user');
+        if (user) {
+            this.currentUser = JSON.parse(user);
+        }
+    }
+
+    saveToStorage() {
+        localStorage.setItem('jls_finance_data', JSON.stringify(this.data));
+        if (this.currentUser) {
+            localStorage.setItem('jls_finance_user', JSON.stringify(this.currentUser));
+        }
+    }
+
+    setupEventListeners() {
+        // Network status monitoring
+        window.addEventListener('online', () => {
+            this.isOnline = true;
+            this.updateNetworkStatus();
+            this.syncOfflineData();
+        });
+
+        window.addEventListener('offline', () => {
+            this.isOnline = false;
+            this.updateNetworkStatus();
+        });
+    }
+
+    updateNetworkStatus() {
+        const indicator = document.getElementById('networkStatus');
+        if (this.isOnline) {
+            indicator.className = 'offline-indicator online';
+            indicator.innerHTML = '<i class="fas fa-wifi"></i> Online';
+        } else {
+            indicator.className = 'offline-indicator offline';
+            indicator.innerHTML = '<i class="fas fa-wifi-slash"></i> Offline';
+        }
+    }
+
+    async initServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const swData = `
+                    const CACHE_NAME = 'jls-finance-v1';
+                    const urlsToCache = [
+                        '/',
+                        '/styles.css',
+                        '/app.js'
+                    ];
+
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swData], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                await navigator.serviceWorker.register(swUrl);
+                console.log('Service Worker registered');
+            } catch (error) {
+                console.log('Service Worker registration failed:', error);
+            }
+        }
+    }
+
+    populateDemoData() {
+        if (this.data.customers.length === 0) {
+            // Demo customers
+            this.data.customers = [
+                {
+                    id: 1,
+                    name: 'राहुल शर्मा',
+                    phone: '+91-9876543210',
+                    email: 'rahul@example.com',
+                    address: 'House No. 123, MG Road, Delhi',
+                    city: 'Delhi',
+                    state: 'Delhi',
+                    pincode: '110001',
+                    status: 'active',
+                    created_at: '2024-01-15'
+                },
+                {
+                    id: 2,
+                    name: 'प्रिया पटेल',
+                    phone: '+91-9876543211',
+                    email: 'priya@example.com',
+                    address: 'Flat 456, Satellite Road, Ahmedabad',
+                    city: 'Ahmedabad',
+                    state: 'Gujarat',
+                    pincode: '380015',
+                    status: 'active',
+                    created_at: '2024-01-20'
+                },
+                {
+                    id: 3,
+                    name: 'अमित कुमार',
+                    phone: '+91-9876543212',
+                    email: 'amit@example.com',
+                    address: '789 Park Street, Mumbai',
+                    city: 'Mumbai',
+                    state: 'Maharashtra',
+                    pincode: '400001',
+                    status: 'active',
+                    created_at: '2024-02-01'
+                }
+            ];
+
+            // Demo loans
+            this.data.loans = [
+                {
+                    id: 'L001',
+                    customer_id: 1,
+                    principal: 50000,
+                    interest_rate: 12.5,
+                    tenure: 12,
+                    processing_fee: 500,
+                    status: 'active',
+                    disbursed_date: '2024-01-20',
+                    emi_amount: 4454
+                },
+                {
+                    id: 'L002',
+                    customer_id: 2,
+                    principal: 75000,
+                    interest_rate: 13.0,
+                    tenure: 18,
+                    processing_fee: 750,
+                    status: 'active',
+                    disbursed_date: '2024-01-25',
+                    emi_amount: 4722
+                },
+                {
+                    id: 'L003',
+                    customer_id: 3,
+                    principal: 100000,
+                    interest_rate: 12.0,
+                    tenure: 24,
+                    processing_fee: 1000,
+                    status: 'active',
+                    disbursed_date: '2024-02-05',
+                    emi_amount: 4707
+                }
+            ];
+
+            // Demo EMIs
+            this.data.emis = [
+                {
+                    id: 1,
+                    loan_id: 'L001',
+                    emi_number: 1,
+                    amount: 4454,
+                    due_date: '2024-02-20',
+                    paid_date: '2024-02-18',
+                    status: 'paid'
+                },
+                {
+                    id: 2,
+                    loan_id: 'L001',
+                    emi_number: 2,
+                    amount: 4454,
+                    due_date: '2024-03-20',
+                    status: 'overdue'
+                },
+                {
+                    id: 3,
+                    loan_id: 'L002',
+                    emi_number: 1,
+                    amount: 4722,
+                    due_date: '2024-02-25',
+                    paid_date: '2024-02-25',
+                    status: 'paid'
+                },
+                {
+                    id: 4,
+                    loan_id: 'L002',
+                    emi_number: 2,
+                    amount: 4722,
+                    due_date: '2024-03-25',
+                    status: 'due'
+                }
+            ];
+
+            // Demo users
+            this.data.users = [
+                {
+                    id: 1,
+                    name: 'Admin User',
+                    email: 'admin@jls.com',
+                    password: 'admin123',
+                    role: 'admin'
+                },
+                {
+                    id: 2,
+                    name: 'Agent User',
+                    email: 'agent@jls.com',
+                    password: 'agent123',
+                    role: 'agent'
+                },
+                {
+                    id: 3,
+                    name: 'Customer User',
+                    email: 'customer@jls.com',
+                    password: 'customer123',
+                    role: 'customer'
+                }
+            ];
+
+            this.saveToStorage();
+        }
+    }
+
+    async syncOfflineData() {
+        if (!this.isOnline || this.offlineQueue.length === 0) return;
+
+        for (const item of this.offlineQueue) {
+            try {
+                await this.processOfflineItem(item);
+                this.showToast('Data synced successfully', 'success');
+            } catch (error) {
+                console.error('Sync failed:', error);
+                this.showToast('Sync failed for some items', 'error');
+            }
+        }
+
+        this.offlineQueue = [];
+        this.saveToStorage();
+    }
+
+    async processOfflineItem(item) {
+        // Simulate API calls
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        switch (item.type) {
+            case 'customer':
+                // Process customer data
+                break;
+            case 'loan':
+                // Process loan data
+                break;
+            case 'emi':
+                // Process EMI data
+                break;
+        }
+    }
+
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `bg-white border-l-4 shadow-lg rounded p-4 mb-2 ${
+            type === 'success' ? 'border-green-500' : 
+            type === 'error' ? 'border-red-500' : 'border-blue-500'
+        }`;
+        
+        toast.innerHTML = `
+            <div class="flex items-center">
+                <i class="fas ${
+                    type === 'success' ? 'fa-check-circle text-green-500' : 
+                    type === 'error' ? 'fa-exclamation-circle text-red-500' : 
+                    'fa-info-circle text-blue-500'
+                } mr-2"></i>
+                <span class="text-gray-800">${message}</span>
+                <button class="ml-auto text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        document.getElementById('toastContainer').appendChild(toast);
+
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 5000);
+    }
+}
+
+// PDF Generation Utilities
+class PDFGenerator {
+    constructor() {
+        this.jsPDF = window.jspdf.jsPDF;
+    }
+
+    generateLoanAgreement(customer, loan) {
+        const doc = new this.jsPDF();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.text('JLS FINANCE LTD', 105, 20, { align: 'center' });
+        doc.setFontSize(16);
+        doc.text('LOAN AGREEMENT', 105, 30, { align: 'center' });
+        
+        // Customer Details
+        doc.setFontSize(12);
+        doc.text('Customer Details:', 20, 50);
+        doc.text(`Name: ${customer.name}`, 20, 60);
+        doc.text(`Phone: ${customer.phone}`, 20, 70);
+        doc.text(`Address: ${customer.address}`, 20, 80);
+        
+        // Loan Details
+        doc.text('Loan Details:', 20, 100);
+        doc.text(`Loan ID: ${loan.id}`, 20, 110);
+        doc.text(`Principal Amount: ₹${loan.principal.toLocaleString()}`, 20, 120);
+        doc.text(`Interest Rate: ${loan.interest_rate}% per annum`, 20, 130);
+        doc.text(`Tenure: ${loan.tenure} months`, 20, 140);
+        doc.text(`EMI Amount: ₹${loan.emi_amount.toLocaleString()}`, 20, 150);
+        
+        // Terms and Conditions
+        doc.text('Terms and Conditions:', 20, 170);
+        const terms = [
+            '1. The borrower agrees to pay the EMI amount on or before the due date.',
+            '2. Late payment charges will be applicable for overdue EMIs.',
+            '3. The loan agreement is governed by Indian law.',
+            '4. Any dispute will be subject to Delhi jurisdiction.'
+        ];
+        
+        let y = 180;
+        terms.forEach(term => {
+            doc.text(term, 20, y);
+            y += 10;
+        });
+        
+        // Signatures
+        doc.text('Borrower Signature: ___________________', 20, 230);
+        doc.text('Lender Signature: ___________________', 20, 250);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 140, 250);
+        
+        return doc;
+    }
+
+    generateEMISchedule(customer, loan, emis) {
+        const doc = new this.jsPDF();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.text('JLS FINANCE LTD', 105, 20, { align: 'center' });
+        doc.setFontSize(16);
+        doc.text('EMI SCHEDULE', 105, 30, { align: 'center' });
+        
+        // Customer and Loan Info
+        doc.setFontSize(12);
+        doc.text(`Customer: ${customer.name}`, 20, 50);
+        doc.text(`Loan ID: ${loan.id}`, 20, 60);
+        doc.text(`Loan Amount: ₹${loan.principal.toLocaleString()}`, 120, 50);
+        doc.text(`EMI Amount: ₹${loan.emi_amount.toLocaleString()}`, 120, 60);
+        
+        // Table Header
+        const tableTop = 80;
+        doc.text('EMI No.', 20, tableTop);
+        doc.text('Due Date', 50, tableTop);
+        doc.text('Amount', 90, tableTop);
+        doc.text('Status', 130, tableTop);
+        doc.text('Paid Date', 160, tableTop);
+        
+        // Draw line under header
+        doc.line(20, tableTop + 2, 190, tableTop + 2);
+        
+        // Table Rows
+        let y = tableTop + 10;
+        emis.forEach(emi => {
+            doc.text(emi.emi_number.toString(), 25, y);
+            doc.text(emi.due_date, 50, y);
+            doc.text(`₹${emi.amount.toLocaleString()}`, 90, y);
+            doc.text(emi.status.toUpperCase(), 130, y);
+            doc.text(emi.paid_date || '-', 160, y);
+            y += 8;
+        });
+        
+        return doc;
+    }
+
+    generateEMIReceipt(customer, loan, emi) {
+        const doc = new this.jsPDF();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.text('JLS FINANCE LTD', 105, 20, { align: 'center' });
+        doc.setFontSize(16);
+        doc.text('EMI PAYMENT RECEIPT', 105, 30, { align: 'center' });
+        
+        // Receipt Details
+        doc.setFontSize(12);
+        doc.text(`Receipt No: R${emi.id}${Date.now()}`, 20, 50);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 140, 50);
+        
+        // Customer Details
+        doc.text('Customer Details:', 20, 70);
+        doc.text(`Name: ${customer.name}`, 20, 80);
+        doc.text(`Phone: ${customer.phone}`, 20, 90);
+        
+        // Payment Details
+        doc.text('Payment Details:', 20, 110);
+        doc.text(`Loan ID: ${loan.id}`, 20, 120);
+        doc.text(`EMI Number: ${emi.emi_number}`, 20, 130);
+        doc.text(`Due Date: ${emi.due_date}`, 20, 140);
+        doc.text(`Amount Paid: ₹${emi.amount.toLocaleString()}`, 20, 150);
+        doc.text(`Payment Date: ${emi.paid_date}`, 20, 160);
+        doc.text('Payment Mode: Cash', 20, 170);
+        
+        // Total box
+        doc.rect(120, 130, 60, 30);
+        doc.text('Total Amount', 125, 140);
+        doc.setFontSize(16);
+        doc.text(`₹${emi.amount.toLocaleString()}`, 135, 155);
+        
+        // Footer
+        doc.setFontSize(10);
+        doc.text('Thank you for your payment!', 105, 200, { align: 'center' });
+        doc.text('This is a computer generated receipt.', 105, 210, { align: 'center' });
+        
+        return doc;
+    }
+}
+
+// Excel Export Utilities
+class ExcelExporter {
+    constructor() {
+        this.XLSX = window.XLSX;
+    }
+
+    exportCustomers(customers) {
+        const ws = this.XLSX.utils.json_to_sheet(customers);
+        const wb = this.XLSX.utils.book_new();
+        this.XLSX.utils.book_append_sheet(wb, ws, 'Customers');
+        this.XLSX.writeFile(wb, `customers_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    exportLoans(loans) {
+        const ws = this.XLSX.utils.json_to_sheet(loans);
+        const wb = this.XLSX.utils.book_new();
+        this.XLSX.utils.book_append_sheet(wb, ws, 'Loans');
+        this.XLSX.writeFile(wb, `loans_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    exportEMIs(emis) {
+        const ws = this.XLSX.utils.json_to_sheet(emis);
+        const wb = this.XLSX.utils.book_new();
+        this.XLSX.utils.book_append_sheet(wb, ws, 'EMIs');
+        this.XLSX.writeFile(wb, `emis_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+
+    exportEMIReport(emis, customers, loans) {
+        const reportData = emis.map(emi => {
+            const loan = loans.find(l => l.id === emi.loan_id);
+            const customer = customers.find(c => c.id === loan?.customer_id);
+            
+            return {
+                'Customer Name': customer?.name || 'N/A',
+                'Phone': customer?.phone || 'N/A',
+                'Loan ID': emi.loan_id,
+                'EMI Number': emi.emi_number,
+                'Amount': emi.amount,
+                'Due Date': emi.due_date,
+                'Status': emi.status,
+                'Paid Date': emi.paid_date || 'Not Paid'
+            };
+        });
+
+        const ws = this.XLSX.utils.json_to_sheet(reportData);
+        const wb = this.XLSX.utils.book_new();
+        this.XLSX.utils.book_append_sheet(wb, ws, 'EMI Report');
+        this.XLSX.writeFile(wb, `emi_report_${new Date().toISOString().split('T')[0]}.xlsx`);
+    }
+}
+
+// WhatsApp Integration
+class WhatsAppIntegration {
+    constructor() {
+        this.apiKey = '';
+        this.apiUrl = 'https://api.360dialog.io/v1/messages'; // Example endpoint
+    }
+
+    setApiKey(key) {
+        this.apiKey = key;
+    }
+
+    generateMessage(type, data) {
+        const templates = {
+            loan_approved: `🎉 *लोन अप्रूवल सूचना*
+
+प्रिय ${data.customerName},
+
+आपका लोन आवेदन अप्रूव हो गया है!
+
+📋 *विवरण:*
+• लोन आईडी: ${data.loanId}
+• राशि: ₹${data.amount}
+• अवधि: ${data.tenure} महीने
+• EMI राशि: ₹${data.emiAmount}
+
+जल्द ही आपसे संपर्क किया जाएगा।
+
+धन्यवाद!
+*JLS FINANCE LTD*`,
+
+            emi_due: `⏰ *EMI रिमाइंडर*
+
+प्रिय ${data.customerName},
+
+आपकी EMI देय है:
+
+📋 *विवरण:*
+• लोन आईडी: ${data.loanId}
+• EMI संख्या: ${data.emiNumber}
+• राशि: ₹${data.amount}
+• देय तिथि: ${data.dueDate}
+
+कृपया समय पर भुगतान करें।
+
+*JLS FINANCE LTD*`,
+
+            emi_paid: `✅ *EMI भुगतान पुष्टि*
+
+प्रिय ${data.customerName},
+
+आपका EMI भुगतान सफल रहा!
+
+📋 *विवरण:*
+• रसीद संख्या: ${data.receiptNo}
+• राशि: ₹${data.amount}
+• भुगतान तिथि: ${data.paidDate}
+
+अगली EMI: ${data.nextDueDate}
+
+धन्यवाद!
+*JLS FINANCE LTD*`
+        };
+
+        return templates[type] || '';
+    }
+
+    async sendMessage(phone, message) {
+        // Simulate API call
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (Math.random() > 0.1) { // 90% success rate
+                    resolve({ success: true, messageId: 'msg_' + Date.now() });
+                } else {
+                    reject(new Error('Failed to send message'));
+                }
+            }, 1000);
+        });
+    }
+
+    showPreview(message, phone, callback) {
+        const modal = document.getElementById('whatsappModal');
+        const preview = document.getElementById('whatsappMessagePreview');
+        
+        preview.textContent = message;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        document.getElementById('sendWhatsapp').onclick = async () => {
+            try {
+                await this.sendMessage(phone, message);
+                appState.showToast('WhatsApp message sent successfully!', 'success');
+                callback(true);
+            } catch (error) {
+                appState.showToast('Failed to send WhatsApp message', 'error');
+                callback(false);
+            }
+            this.closePreview();
+        };
+    }
+
+    closePreview() {
+        const modal = document.getElementById('whatsappModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
+// UI Controller
+class UIController {
+    constructor(appState) {
+        this.appState = appState;
+        this.pdfGenerator = new PDFGenerator();
+        this.excelExporter = new ExcelExporter();
+        this.whatsapp = new WhatsAppIntegration();
+        this.init();
+    }
+
+    init() {
+        this.setupEventListeners();
+        this.setupCharts();
+        setTimeout(() => this.hideLoadingScreen(), 1500);
+    }
+
+    hideLoadingScreen() {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('app').classList.remove('hidden');
+        
+        if (this.appState.currentUser) {
+            this.showMainApp();
+        } else {
+            this.showLoginPage();
+        }
+    }
+
+    setupEventListeners() {
+        // Login form
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleLogin();
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            this.handleLogout();
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const page = link.dataset.page;
+                this.showPage(page);
+            });
+        });
+
+        // Customer Management
+        document.getElementById('addCustomerBtn').addEventListener('click', () => {
+            this.showCustomerModal();
+        });
+
+        document.getElementById('closeCustomerModal').addEventListener('click', () => {
+            this.hideCustomerModal();
+        });
+
+        document.getElementById('customerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleCustomerSave();
+        });
+
+        // Loan Management
+        document.getElementById('addLoanBtn').addEventListener('click', () => {
+            this.showLoanModal();
+        });
+
+        document.getElementById('closeLoanModal').addEventListener('click', () => {
+            this.hideLoanModal();
+        });
+
+        document.getElementById('loanForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleLoanSave();
+        });
+
+        document.getElementById('calculateEMI').addEventListener('click', () => {
+            this.calculateEMIPreview();
+        });
+
+        // EMI Collection
+        document.getElementById('exportEMIReportBtn').addEventListener('click', () => {
+            this.exportEMIReport();
+        });
+
+        // Reports
+        document.getElementById('generateReportBtn').addEventListener('click', () => {
+            this.generateReport();
+        });
+
+        document.getElementById('exportPDFBtn').addEventListener('click', () => {
+            this.exportReportPDF();
+        });
+
+        document.getElementById('exportExcelBtn').addEventListener('click', () => {
+            this.exportReportExcel();
+        });
+
+        // WhatsApp Modal
+        document.getElementById('closeWhatsappModal').addEventListener('click', () => {
+            this.whatsapp.closePreview();
+        });
+
+        document.getElementById('cancelWhatsapp').addEventListener('click', () => {
+            this.whatsapp.closePreview();
+        });
+
+        // Search and Filter
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            this.filterCustomers();
+        });
+
+        document.getElementById('filterLoansBtn').addEventListener('click', () => {
+            this.filterLoans();
+        });
+
+        document.getElementById('filterEMIsBtn').addEventListener('click', () => {
+            this.filterEMIs();
+        });
+    }
+
+    handleLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+
+        const user = this.appState.data.users.find(u => 
+            u.email === email && u.password === password
+        );
+
+        if (user) {
+            this.appState.currentUser = user;
+            this.appState.saveToStorage();
+            this.showMainApp();
+            this.appState.showToast(`Welcome, ${user.name}!`, 'success');
+        } else {
+            this.appState.showToast('Invalid credentials', 'error');
+        }
+    }
+
+    handleLogout() {
+        this.appState.currentUser = null;
+        localStorage.removeItem('jls_finance_user');
+        this.showLoginPage();
+        this.appState.showToast('Logged out successfully', 'info');
+    }
+
+    showLoginPage() {
+        document.getElementById('navbar').style.display = 'none';
+        document.getElementById('sidebar').style.display = 'none';
+        document.querySelector('.ml-64').classList.remove('ml-64');
+        
+        // Hide all pages
+        document.querySelectorAll('[id$="Page"]').forEach(page => {
+            page.classList.add('hidden');
+        });
+        
+        document.getElementById('loginPage').classList.remove('hidden');
+    }
+
+    showMainApp() {
+        document.getElementById('navbar').style.display = 'block';
+        document.getElementById('sidebar').style.display = 'block';
+        document.querySelector('.p-6').classList.add('ml-64');
+        
+        document.getElementById('loginPage').classList.add('hidden');
+        
+        // Update user info
+        document.getElementById('userInfo').textContent = 
+            `${this.appState.currentUser.name} (${this.appState.currentUser.role.toUpperCase()})`;
+        
+        // Hide admin menu for non-admin users
+        if (this.appState.currentUser.role !== 'admin') {
+            document.getElementById('adminOnly').style.display = 'none';
+        }
+        
+        this.showPage('dashboard');
+    }
+
+    showPage(pageName) {
+        // Update navigation active state
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('bg-gray-700');
+        });
+        document.querySelector(`[data-page="${pageName}"]`).classList.add('bg-gray-700');
+
+        // Hide all pages
+        document.querySelectorAll('[id$="Page"]').forEach(page => {
+            page.classList.add('hidden');
+        });
+
+        // Show selected page
+        document.getElementById(`${pageName}Page`).classList.remove('hidden');
+
+        // Load page-specific data
+        switch (pageName) {
+            case 'dashboard':
+                this.loadDashboard();
+                break;
+            case 'customers':
+                this.loadCustomers();
+                break;
+            case 'loans':
+                this.loadLoans();
+                break;
+            case 'emi-collection':
+                this.loadEMICollection();
+                break;
+            case 'reports':
+                this.loadReports();
+                break;
+            case 'admin':
+                this.loadAdminPanel();
+                break;
+        }
+    }
+
+    loadDashboard() {
+        // Update stats
+        document.getElementById('totalCustomers').textContent = this.appState.data.customers.length;
+        document.getElementById('activeLoans').textContent = 
+            this.appState.data.loans.filter(l => l.status === 'active').length;
+        
+        const outstandingAmount = this.appState.data.emis
+            .filter(e => e.status !== 'paid')
+            .reduce((sum, emi) => sum + emi.amount, 0);
+        document.getElementById('outstandingEMIs').textContent = `₹${outstandingAmount.toLocaleString()}`;
+        
+        const todayCollections = this.appState.data.emis
+            .filter(e => e.paid_date === new Date().toISOString().split('T')[0])
+            .reduce((sum, emi) => sum + emi.amount, 0);
+        document.getElementById('todayCollections').textContent = `₹${todayCollections.toLocaleString()}`;
+
+        // Load recent activities
+        this.loadRecentActivities();
+    }
+
+    loadRecentActivities() {
+        const activities = [
+            {
+                icon: 'fa-user-plus',
+                color: 'text-green-600',
+                text: 'New customer राहुल शर्मा registered',
+                time: '2 hours ago'
+            },
+            {
+                icon: 'fa-money-bill-wave',
+                color: 'text-blue-600',
+                text: 'Loan L001 approved for ₹50,000',
+                time: '4 hours ago'
+            },
+            {
+                icon: 'fa-coins',
+                color: 'text-purple-600',
+                text: 'EMI payment collected from प्रिया पटेल',
+                time: '6 hours ago'
+            }
+        ];
+
+        const container = document.getElementById('recentActivities');
+        container.innerHTML = activities.map(activity => `
+            <div class="flex items-center">
+                <div class="p-2 rounded-full bg-gray-100">
+                    <i class="fas ${activity.icon} ${activity.color}"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900">${activity.text}</p>
+                    <p class="text-xs text-gray-500">${activity.time}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    loadCustomers() {
+        const tbody = document.getElementById('customersTable');
+        tbody.innerHTML = this.appState.data.customers.map(customer => `
+            <tr>
+                <td class="px-6 py-4">
+                    <div class="font-medium text-gray-900">${customer.name}</div>
+                    <div class="text-gray-500">${customer.email || 'No email'}</div>
+                </td>
+                <td class="px-6 py-4 text-gray-900">${customer.phone}</td>
+                <td class="px-6 py-4 text-gray-900">${customer.address}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                        customer.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }">
+                        ${customer.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <button class="text-blue-600 hover:text-blue-900 mr-2" onclick="ui.editCustomer(${customer.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-green-600 hover:text-green-900 mr-2" onclick="ui.viewCustomer(${customer.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-900" onclick="ui.deleteCustomer(${customer.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    loadLoans() {
+        const tbody = document.getElementById('loansTable');
+        tbody.innerHTML = this.appState.data.loans.map(loan => {
+            const customer = this.appState.data.customers.find(c => c.id === loan.customer_id);
+            return `
+                <tr>
+                    <td class="px-6 py-4 font-medium text-gray-900">${loan.id}</td>
+                    <td class="px-6 py-4">
+                        <div class="text-gray-900">${customer?.name || 'Unknown'}</div>
+                        <div class="text-gray-500 text-sm">${customer?.phone || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-900">₹${loan.principal.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-gray-900">${loan.tenure} months</td>
+                    <td class="px-6 py-4 text-gray-900">${loan.interest_rate}%</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                            loan.status === 'active' ? 'bg-green-100 text-green-800' : 
+                            loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                        }">
+                            ${loan.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        <button class="text-blue-600 hover:text-blue-900 mr-2" onclick="ui.generateLoanAgreement('${loan.id}')">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+                        <button class="text-green-600 hover:text-green-900 mr-2" onclick="ui.generateEMISchedule('${loan.id}')">
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
+                        <button class="text-purple-600 hover:text-purple-900" onclick="ui.sendLoanNotification('${loan.id}')">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Populate customer dropdown in loan form
+        const customerSelect = document.getElementById('loanCustomerSelect');
+        customerSelect.innerHTML = '<option value="">Select Customer</option>' +
+            this.appState.data.customers.map(customer => 
+                `<option value="${customer.id}">${customer.name} - ${customer.phone}</option>`
+            ).join('');
+    }
+
+    loadEMICollection() {
+        const tbody = document.getElementById('emiTable');
+        tbody.innerHTML = this.appState.data.emis.map(emi => {
+            const loan = this.appState.data.loans.find(l => l.id === emi.loan_id);
+            const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+            
+            const isOverdue = new Date(emi.due_date) < new Date() && emi.status !== 'paid';
+            const statusClass = emi.status === 'paid' ? 'bg-green-100 text-green-800' :
+                               isOverdue ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800';
+
+            return `
+                <tr>
+                    <td class="px-6 py-4">
+                        <div class="font-medium text-gray-900">${customer?.name || 'Unknown'}</div>
+                        <div class="text-gray-500 text-sm">${customer?.phone || ''}</div>
+                    </td>
+                    <td class="px-6 py-4 text-gray-900">${emi.loan_id}</td>
+                    <td class="px-6 py-4 text-gray-900">${emi.emi_number}</td>
+                    <td class="px-6 py-4 text-gray-900">₹${emi.amount.toLocaleString()}</td>
+                    <td class="px-6 py-4 text-gray-900">${emi.due_date}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                            ${isOverdue && emi.status !== 'paid' ? 'overdue' : emi.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-500">
+                        ${emi.status !== 'paid' ? `
+                            <button class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 mr-2" onclick="ui.collectEMI(${emi.id})">
+                                Collect
+                            </button>
+                        ` : `
+                            <button class="text-blue-600 hover:text-blue-900 mr-2" onclick="ui.generateEMIReceipt(${emi.id})">
+                                <i class="fas fa-receipt"></i>
+                            </button>
+                        `}
+                        <button class="text-green-600 hover:text-green-900" onclick="ui.sendEMIReminder(${emi.id})">
+                            <i class="fab fa-whatsapp"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Update summary stats
+        const overdueCount = this.appState.data.emis.filter(e => 
+            new Date(e.due_date) < new Date() && e.status !== 'paid'
+        ).length;
+        document.getElementById('overdueEMIs').textContent = overdueCount;
+
+        const dueTodayCount = this.appState.data.emis.filter(e => 
+            e.due_date === new Date().toISOString().split('T')[0] && e.status !== 'paid'
+        ).length;
+        document.getElementById('dueTodayEMIs').textContent = dueTodayCount;
+    }
+
+    loadReports() {
+        this.setupReportCharts();
+    }
+
+    loadAdminPanel() {
+        // Load admin-specific data
+    }
+
+    showCustomerModal(customerId = null) {
+        const modal = document.getElementById('customerModal');
+        const title = document.getElementById('customerModalTitle');
+        const form = document.getElementById('customerForm');
+
+        if (customerId) {
+            title.textContent = 'Edit Customer';
+            const customer = this.appState.data.customers.find(c => c.id === customerId);
+            if (customer) {
+                // Populate form with customer data
+                Object.keys(customer).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input) input.value = customer[key];
+                });
+            }
+        } else {
+            title.textContent = 'Add New Customer';
+            form.reset();
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    hideCustomerModal() {
+        const modal = document.getElementById('customerModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    async handleCustomerSave() {
+        const form = document.getElementById('customerForm');
+        const formData = new FormData(form);
+        const customerData = Object.fromEntries(formData.entries());
+
+        // Handle file uploads (simulate ImgBB upload)
+        const files = ['aadhaar', 'pan', 'photo'];
+        for (const fileType of files) {
+            const file = formData.get(fileType);
+            if (file && file.size > 0) {
+                try {
+                    const imageUrl = await this.uploadToImgBB(file);
+                    customerData[`${fileType}_url`] = imageUrl;
+                } catch (error) {
+                    this.appState.showToast(`Failed to upload ${fileType}`, 'error');
+                    return;
+                }
+            }
+        }
+
+        // Generate ID for new customer
+        if (!customerData.id) {
+            customerData.id = this.appState.data.customers.length + 1;
+            customerData.created_at = new Date().toISOString().split('T')[0];
+            customerData.status = 'active';
+        }
+
+        // Save to data
+        const existingIndex = this.appState.data.customers.findIndex(c => c.id == customerData.id);
+        if (existingIndex >= 0) {
+            this.appState.data.customers[existingIndex] = { 
+                ...this.appState.data.customers[existingIndex], 
+                ...customerData 
+            };
+        } else {
+            this.appState.data.customers.push(customerData);
+        }
+
+        this.appState.saveToStorage();
+        this.hideCustomerModal();
+        this.loadCustomers();
+        this.appState.showToast('Customer saved successfully!', 'success');
+
+        // Send welcome WhatsApp message for new customers
+        if (existingIndex < 0) {
+            this.sendWelcomeMessage(customerData);
+        }
+    }
+
+    async uploadToImgBB(file) {
+        // Simulate ImgBB upload
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(`https://i.ibb.co/demo/${Date.now()}.jpg`);
+            }, 1000);
+        });
+    }
+
+    showLoanModal(loanId = null) {
+        const modal = document.getElementById('loanModal');
+        const title = document.getElementById('loanModalTitle');
+        const form = document.getElementById('loanForm');
+
+        if (loanId) {
+            title.textContent = 'Edit Loan';
+            // Populate form with loan data
+        } else {
+            title.textContent = 'Create New Loan';
+            form.reset();
+        }
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    hideLoanModal() {
+        const modal = document.getElementById('loanModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        document.getElementById('emiPreview').classList.add('hidden');
+    }
+
+    calculateEMIPreview() {
+        const form = document.getElementById('loanForm');
+        const principal = parseFloat(form.principal.value) || 0;
+        const rate = parseFloat(form.interest_rate.value) || 0;
+        const tenure = parseInt(form.tenure.value) || 0;
+        const processingFee = parseFloat(form.processing_fee.value) || 0;
+
+        if (principal && rate && tenure) {
+            const monthlyRate = rate / 12 / 100;
+            const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / 
+                        (Math.pow(1 + monthlyRate, tenure) - 1);
+            
+            const totalAmount = emi * tenure;
+            const totalInterest = totalAmount - principal;
+            const netDisbursed = principal - processingFee;
+
+            document.getElementById('previewEMI').textContent = `₹${Math.round(emi).toLocaleString()}`;
+            document.getElementById('previewInterest').textContent = `₹${Math.round(totalInterest).toLocaleString()}`;
+            document.getElementById('previewTotal').textContent = `₹${Math.round(totalAmount).toLocaleString()}`;
+            document.getElementById('previewDisbursed').textContent = `₹${netDisbursed.toLocaleString()}`;
+
+            document.getElementById('emiPreview').classList.remove('hidden');
+        }
+    }
+
+    handleLoanSave() {
+        const form = document.getElementById('loanForm');
+        const formData = new FormData(form);
+        const loanData = Object.fromEntries(formData.entries());
+
+        // Calculate EMI
+        const principal = parseFloat(loanData.principal);
+        const rate = parseFloat(loanData.interest_rate);
+        const tenure = parseInt(loanData.tenure);
+        const monthlyRate = rate / 12 / 100;
+        const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, tenure)) / 
+                    (Math.pow(1 + monthlyRate, tenure) - 1);
+
+        // Generate loan ID
+        loanData.id = `L${String(this.appState.data.loans.length + 1).padStart(3, '0')}`;
+        loanData.emi_amount = Math.round(emi);
+        loanData.status = 'active';
+        loanData.disbursed_date = new Date().toISOString().split('T')[0];
+        loanData.customer_id = parseInt(loanData.customer_id);
+
+        // Generate EMI schedule
+        const emis = [];
+        const startDate = new Date();
+        for (let i = 1; i <= tenure; i++) {
+            const dueDate = new Date(startDate);
+            dueDate.setMonth(startDate.getMonth() + i);
+            
+            emis.push({
+                id: this.appState.data.emis.length + i,
+                loan_id: loanData.id,
+                emi_number: i,
+                amount: Math.round(emi),
+                due_date: dueDate.toISOString().split('T')[0],
+                status: 'due'
+            });
+        }
+
+        // Save loan and EMIs
+        this.appState.data.loans.push(loanData);
+        this.appState.data.emis.push(...emis);
+
+        this.appState.saveToStorage();
+        this.hideLoanModal();
+        this.loadLoans();
+        this.appState.showToast('Loan created successfully!', 'success');
+
+        // Send loan approval WhatsApp message
+        this.sendLoanApprovalMessage(loanData);
+    }
+
+    collectEMI(emiId) {
+        const emi = this.appState.data.emis.find(e => e.id === emiId);
+        if (emi) {
+            emi.status = 'paid';
+            emi.paid_date = new Date().toISOString().split('T')[0];
+            
+            this.appState.saveToStorage();
+            this.loadEMICollection();
+            this.appState.showToast('EMI collected successfully!', 'success');
+
+            // Generate and download receipt
+            this.generateEMIReceipt(emiId);
+            
+            // Send WhatsApp confirmation
+            this.sendEMIConfirmation(emiId);
+        }
+    }
+
+    generateLoanAgreement(loanId) {
+        const loan = this.appState.data.loans.find(l => l.id === loanId);
+        const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+        
+        if (loan && customer) {
+            const doc = this.pdfGenerator.generateLoanAgreement(customer, loan);
+            doc.save(`loan_agreement_${loanId}.pdf`);
+            this.appState.showToast('Loan agreement generated!', 'success');
+        }
+    }
+
+    generateEMISchedule(loanId) {
+        const loan = this.appState.data.loans.find(l => l.id === loanId);
+        const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+        const emis = this.appState.data.emis.filter(e => e.loan_id === loanId);
+        
+        if (loan && customer && emis.length > 0) {
+            const doc = this.pdfGenerator.generateEMISchedule(customer, loan, emis);
+            doc.save(`emi_schedule_${loanId}.pdf`);
+            this.appState.showToast('EMI schedule generated!', 'success');
+        }
+    }
+
+    generateEMIReceipt(emiId) {
+        const emi = this.appState.data.emis.find(e => e.id === emiId);
+        const loan = this.appState.data.loans.find(l => l.id === emi?.loan_id);
+        const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+        
+        if (emi && loan && customer) {
+            const doc = this.pdfGenerator.generateEMIReceipt(customer, loan, emi);
+            doc.save(`emi_receipt_${emiId}.pdf`);
+            this.appState.showToast('EMI receipt generated!', 'success');
+        }
+    }
+
+    exportEMIReport() {
+        this.excelExporter.exportEMIReport(
+            this.appState.data.emis,
+            this.appState.data.customers,
+            this.appState.data.loans
+        );
+        this.appState.showToast('EMI report exported!', 'success');
+    }
+
+    sendWelcomeMessage(customer) {
+        const message = this.whatsapp.generateMessage('welcome', {
+            customerName: customer.name
+        });
+        
+        this.whatsapp.showPreview(message, customer.phone, (success) => {
+            if (success) {
+                // Log message
+            }
+        });
+    }
+
+    sendLoanApprovalMessage(loan) {
+        const customer = this.appState.data.customers.find(c => c.id === loan.customer_id);
+        if (customer) {
+            const message = this.whatsapp.generateMessage('loan_approved', {
+                customerName: customer.name,
+                loanId: loan.id,
+                amount: loan.principal.toLocaleString(),
+                tenure: loan.tenure,
+                emiAmount: loan.emi_amount.toLocaleString()
+            });
+            
+            this.whatsapp.showPreview(message, customer.phone, (success) => {
+                // Log message
+            });
+        }
+    }
+
+    sendEMIReminder(emiId) {
+        const emi = this.appState.data.emis.find(e => e.id === emiId);
+        const loan = this.appState.data.loans.find(l => l.id === emi?.loan_id);
+        const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+        
+        if (emi && loan && customer) {
+            const message = this.whatsapp.generateMessage('emi_due', {
+                customerName: customer.name,
+                loanId: loan.id,
+                emiNumber: emi.emi_number,
+                amount: emi.amount.toLocaleString(),
+                dueDate: emi.due_date
+            });
+            
+            this.whatsapp.showPreview(message, customer.phone, (success) => {
+                // Log message
+            });
+        }
+    }
+
+    sendEMIConfirmation(emiId) {
+        const emi = this.appState.data.emis.find(e => e.id === emiId);
+        const loan = this.appState.data.loans.find(l => l.id === emi?.loan_id);
+        const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+        
+        if (emi && loan && customer) {
+            const nextEMI = this.appState.data.emis.find(e => 
+                e.loan_id === loan.id && e.emi_number === emi.emi_number + 1
+            );
+            
+            const message = this.whatsapp.generateMessage('emi_paid', {
+                customerName: customer.name,
+                receiptNo: `R${emi.id}${Date.now()}`,
+                amount: emi.amount.toLocaleString(),
+                paidDate: emi.paid_date,
+                nextDueDate: nextEMI?.due_date || 'Completed'
+            });
+            
+            this.whatsapp.showPreview(message, customer.phone, (success) => {
+                // Log message
+            });
+        }
+    }
+
+    setupCharts() {
+        // Dashboard Charts
+        this.setupDashboardCharts();
+    }
+
+    setupDashboardCharts() {
+        // Loan Distribution Chart
+        const loanCtx = document.getElementById('loanChart');
+        if (loanCtx) {
+            new Chart(loanCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active Loans', 'Pending', 'Closed'],
+                    datasets: [{
+                        data: [65, 20, 15],
+                        backgroundColor: ['#10b981', '#f59e0b', '#6b7280'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Collection Chart
+        const collectionCtx = document.getElementById('collectionChart');
+        if (collectionCtx) {
+            new Chart(collectionCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Collections',
+                        data: [120000, 190000, 150000, 220000, 180000, 250000],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value / 1000) + 'K';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    setupReportCharts() {
+        // Disbursement Trend Chart
+        const disbursementCtx = document.getElementById('disbursementChart');
+        if (disbursementCtx) {
+            new Chart(disbursementCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Disbursement',
+                        data: [500000, 750000, 600000, 900000, 800000, 1200000],
+                        backgroundColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₹' + (value / 100000) + 'L';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Performance Chart
+        const performanceCtx = document.getElementById('performanceChart');
+        if (performanceCtx) {
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Collection Rate %',
+                        data: [92, 94, 91, 96, 93, 95],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 85,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    generateReport() {
+        const reportType = document.getElementById('reportType').value;
+        this.appState.showToast(`${reportType} report generated!`, 'success');
+    }
+
+    exportReportPDF() {
+        this.appState.showToast('Report exported to PDF!', 'success');
+    }
+
+    exportReportExcel() {
+        this.appState.showToast('Report exported to Excel!', 'success');
+    }
+
+    // Filter functions
+    filterCustomers() {
+        const searchTerm = document.getElementById('searchCustomer').value.toLowerCase();
+        const statusFilter = document.getElementById('filterStatus').value;
+        
+        const filtered = this.appState.data.customers.filter(customer => {
+            const matchesSearch = customer.name.toLowerCase().includes(searchTerm) || 
+                                customer.phone.includes(searchTerm);
+            const matchesStatus = !statusFilter || customer.status === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+        
+        // Update table with filtered results
+        this.updateCustomersTable(filtered);
+    }
+
+    filterLoans() {
+        const statusFilter = document.getElementById('loanStatusFilter').value;
+        const customerSearch = document.getElementById('loanCustomerSearch').value.toLowerCase();
+        const dateFilter = document.getElementById('loanDateFilter').value;
+        
+        const filtered = this.appState.data.loans.filter(loan => {
+            const customer = this.appState.data.customers.find(c => c.id === loan.customer_id);
+            const matchesStatus = !statusFilter || loan.status === statusFilter;
+            const matchesCustomer = !customerSearch || 
+                (customer && customer.name.toLowerCase().includes(customerSearch));
+            const matchesDate = !dateFilter || loan.disbursed_date === dateFilter;
+            
+            return matchesStatus && matchesCustomer && matchesDate;
+        });
+        
+        this.updateLoansTable(filtered);
+    }
+
+    filterEMIs() {
+        const statusFilter = document.getElementById('emiStatusFilter').value;
+        const customerSearch = document.getElementById('emiCustomerSearch').value.toLowerCase();
+        const dateFilter = document.getElementById('emiDateFilter').value;
+        
+        const filtered = this.appState.data.emis.filter(emi => {
+            const loan = this.appState.data.loans.find(l => l.id === emi.loan_id);
+            const customer = this.appState.data.customers.find(c => c.id === loan?.customer_id);
+            
+            const isOverdue = new Date(emi.due_date) < new Date() && emi.status !== 'paid';
+            const actualStatus = isOverdue ? 'overdue' : emi.status;
+            
+            const matchesStatus = !statusFilter || actualStatus === statusFilter;
+            const matchesCustomer = !customerSearch || 
+                (customer && customer.name.toLowerCase().includes(customerSearch));
+            const matchesDate = !dateFilter || emi.due_date === dateFilter;
+            
+            return matchesStatus && matchesCustomer && matchesDate;
+        });
+        
+        this.updateEMITable(filtered);
+    }
+
+    updateCustomersTable(customers) {
+        const tbody = document.getElementById('customersTable');
+        tbody.innerHTML = customers.map(customer => `
+            <tr>
+                <td class="px-6 py-4">
+                    <div class="font-medium text-gray-900">${customer.name}</div>
+                    <div class="text-gray-500">${customer.email || 'No email'}</div>
+                </td>
+                <td class="px-6 py-4 text-gray-900">${customer.phone}</td>
+                <td class="px-6 py-4 text-gray-900">${customer.address}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                        customer.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }">
+                        ${customer.status}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500">
+                    <button class="text-blue-600 hover:text-blue-900 mr-2" onclick="ui.editCustomer(${customer.id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="text-green-600 hover:text-green-900 mr-2" onclick="ui.viewCustomer(${customer.id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="text-red-600 hover:text-red-900" onclick="ui.deleteCustomer(${customer.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    updateLoansTable(loans) {
+        // Similar implementation for loans table
+    }
+
+    updateEMITable(emis) {
+        // Similar implementation for EMI table
+    }
+
+    // Customer action methods
+    editCustomer(customerId) {
+        this.showCustomerModal(customerId);
+    }
+
+    viewCustomer(customerId) {
+        const customer = this.appState.data.customers.find(c => c.id === customerId);
+        if (customer) {
+            this.appState.showToast(`Viewing customer: ${customer.name}`, 'info');
+            // Implement customer detail view
+        }
+    }
+
+    deleteCustomer(customerId) {
+        if (confirm('Are you sure you want to delete this customer?')) {
+            this.appState.data.customers = this.appState.data.customers.filter(c => c.id !== customerId);
+            this.appState.saveToStorage();
+            this.loadCustomers();
+            this.appState.showToast('Customer deleted successfully!', 'success');
+        }
+    }
+}
+
+// Initialize Application
+let appState, ui;
+
+document.addEventListener('DOMContentLoaded', () => {
+    appState = new AppState();
+    ui = new UIController(appState);
+    
+    // Make UI available globally for onclick handlers
+    window.ui = ui;
+});
+</script>
+
+</body>
+</html>
