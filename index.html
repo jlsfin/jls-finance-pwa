@@ -281,11 +281,11 @@
                     <form id="emailLoginForm" class="space-y-4">
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                            <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                            <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" value="admin@jls.com" required>
                         </div>
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                            <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                            <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" value="password" required>
                         </div>
                         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
                             Login with Email
@@ -297,12 +297,12 @@
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Phone Number</label>
                             <div class="phone-input-container">
-                                <input type="tel" id="loginPhone" class="phone-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="9876543210" required>
+                                <input type="tel" id="loginPhone" class="phone-input w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="9876543210" value="8888888888" required>
                             </div>
                         </div>
                         <div>
                             <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                            <input type="password" id="phonePassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                            <input type="password" id="phonePassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" value="password" required>
                         </div>
                         <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">
                             Login with Phone
@@ -487,125 +487,43 @@
 
             <!-- WhatsApp Management Page -->
             <div id="whatsappPage" class="hidden">
+                <!-- ... existing WhatsApp page content ... -->
+            </div>
+            
+            <!-- Loan Management Page -->
+            <div id="loansPage" class="hidden">
                 <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800">WhatsApp Management</h2>
-                    <p class="text-gray-600">Automated messaging and communication with 360Dialog/Twilio integration</p>
+                    <h2 class="text-2xl font-bold text-gray-800">Loan Management</h2>
+                    <p class="text-gray-600">Manage loans, generate documents, and track repayments</p>
                 </div>
-
-                <!-- WhatsApp Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-green-100">
-                                <i class="fab fa-whatsapp text-green-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">Messages Sent</p>
-                                <p class="text-2xl font-semibold text-gray-900" id="messagesSent">1,234</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-yellow-100">
-                                <i class="fas fa-clock text-yellow-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">Pending</p>
-                                <p class="text-2xl font-semibold text-gray-900" id="messagesPending">23</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-red-100">
-                                <i class="fas fa-exclamation-triangle text-red-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">Failed</p>
-                                <p class="text-2xl font-semibold text-gray-900" id="messagesFailed">12</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow p-6">
-                        <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-blue-100">
-                                <i class="fas fa-percentage text-blue-600"></i>
-                            </div>
-                            <div class="ml-4">
-                                <p class="text-sm font-medium text-gray-600">Success Rate</p>
-                                <p class="text-2xl font-semibold text-gray-900" id="successRate">94.5%</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- WhatsApp Configuration -->
-                <div class="bg-white rounded-lg shadow p-6 mb-8">
-                    <h3 class="text-lg font-semibold mb-4">API Configuration</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- 360Dialog Config -->
+                
+                <!-- Loan Documents Section -->
+                <div id="loanDocumentsSection" class="bg-white rounded-lg shadow p-6">
+                    <h3 class="text-xl font-semibold mb-4">Loan Documents</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="border rounded-lg p-4">
-                            <h4 class="font-semibold mb-3">
-                                <i class="fab fa-whatsapp mr-2 text-green-600"></i>360Dialog API
-                            </h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
-                                    <input type="password" id="dialog360ApiKey" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter 360Dialog API Key">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Webhook URL</label>
-                                    <input type="url" id="dialog360Webhook" class="w-full px-3 py-2 border rounded text-sm" placeholder="https://your-webhook-url.com">
-                                </div>
-                                <button id="save360DialogConfig" class="w-full bg-green-600 text-white px-3 py-2 rounded text-sm hover:bg-green-700">
-                                    Save & Test
-                                </button>
-                            </div>
+                            <h4 class="font-medium mb-2">Loan Agreement</h4>
+                            <button id="generateAgreementBtn" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+                                Generate & Preview
+                            </button>
                         </div>
-
-                        <!-- Twilio Config -->
                         <div class="border rounded-lg p-4">
-                            <h4 class="font-semibold mb-3">
-                                <i class="fas fa-sms mr-2 text-blue-600"></i>Twilio API
-                            </h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Account SID</label>
-                                    <input type="text" id="twilioAccountSid" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter Twilio Account SID">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Auth Token</label>
-                                    <input type="password" id="twilioAuthToken" class="w-full px-3 py-2 border rounded text-sm" placeholder="Enter Twilio Auth Token">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">From Number</label>
-                                    <input type="tel" id="twilioFromNumber" class="w-full px-3 py-2 border rounded text-sm" placeholder="+1234567890">
-                                </div>
-                                <button id="saveTwilioConfig" class="w-full bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700">
-                                    Save & Test
-                                </button>
-                            </div>
+                            <h4 class="font-medium mb-2">Loan Card</h4>
+                            <button id="generateCardBtn" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+                                Generate & Preview
+                            </button>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="bg-white rounded-lg shadow p-6">
-                    <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button id="sendEMIRemindersBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-3 rounded-lg">
-                            <i class="fas fa-bell mr-2"></i>Send EMI Reminders
-                        </button>
-                        <button id="sendOverdueNoticesBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-3 rounded-lg">
-                            <i class="fas fa-exclamation-triangle mr-2"></i>Send Overdue Notices
-                        </button>
-                        <button id="testWhatsAppBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg">
-                            <i class="fas fa-vial mr-2"></i>Test Connection
-                        </button>
+                    <div id="pdfPreviewContainer" class="mt-6 hidden">
+                        <iframe id="pdfPreview" class="w-full h-96 border rounded-lg"></iframe>
+                        <div class="mt-4 flex space-x-2">
+                            <button id="downloadPdfBtn" class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900">
+                                Download PDF
+                            </button>
+                            <button id="newDocumentBtn" class="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100">
+                                Generate Another
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -618,7 +536,9 @@
     <div id="toastContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
     <!-- Enhanced JavaScript Application -->
-    <script>
+    <script type="module">
+        import { dataService } from './data-service.js';
+        
         // Enhanced Application with all features integrated
         class EnhancedJLSFinanceApp {
             constructor() {
@@ -644,6 +564,9 @@
             async init() {
                 try {
                     console.log('Initializing Enhanced JLS Finance App...')
+                    
+                    // Initialize data service
+                    window.dataService = dataService;
                     
                     // Setup PWA
                     this.setupPWA()
@@ -838,32 +761,46 @@
                 const email = document.getElementById('loginEmail').value
                 const password = document.getElementById('loginPassword').value
 
-                // Simulate authentication
-                const user = this.demoData.users.find(u => u.email === email)
+            try {
+                if (!window.dataService) {
+                    throw new Error('Data service not initialized')
+                }
                 
-                if (user && password === 'demo123') {
-                    this.currentUser = user
+                const result = await window.dataService.getUsers({ email })
+                if (result.success && result.data.length > 0 && result.data[0].password === password) {
+                    this.currentUser = result.data[0]
                     this.showToast('Login successful!', 'success')
                     this.showMainApp()
                 } else {
-                    this.showToast('Invalid credentials. Use demo123 as password.', 'error')
+                    this.showToast('Invalid credentials', 'error')
                 }
+            } catch (error) {
+                console.error('Login error:', error)
+                this.showToast('Authentication failed. Try again later.', 'error')
+            }
             }
 
             async handlePhoneLogin() {
                 const phone = document.getElementById('loginPhone').value
                 const password = document.getElementById('phonePassword').value
 
-                // Simulate phone authentication
-                const user = this.demoData.users.find(u => u.phone.includes(phone))
+            try {
+                if (!window.dataService) {
+                    throw new Error('Data service not initialized')
+                }
                 
-                if (user && password === 'demo123') {
-                    this.currentUser = user
-                    this.showToast('Phone login successful!', 'success')
+                const result = await window.dataService.getUsers({ phone })
+                if (result.success && result.data.length > 0 && result.data[0].password === password) {
+                    this.currentUser = result.data[0]
+                    this.showToast('Login successful!', 'success')
                     this.showMainApp()
                 } else {
-                    this.showToast('Invalid credentials. Use demo123 as password.', 'error')
+                    this.showToast('Invalid credentials', 'error')
                 }
+            } catch (error) {
+                console.error('Login error:', error)
+                this.showToast('Authentication failed. Try again later.', 'error')
+            }
             }
 
             async sendOTP() {
@@ -895,12 +832,23 @@
             }
 
             async handleDemoLogin(role) {
-                const user = this.demoData.users.find(u => u.role === role)
-                if (user) {
-                    this.currentUser = user
+            try {
+                if (!window.dataService) {
+                    throw new Error('Data service not initialized')
+                }
+                
+                const result = await window.dataService.getUsers({ role })
+                if (result.success && result.data.length > 0) {
+                    this.currentUser = result.data[0]
                     this.showToast(`Demo ${role} login successful!`, 'success')
                     this.showMainApp()
+                } else {
+                    this.showToast('Demo user not found', 'error')
                 }
+            } catch (error) {
+                console.error('Demo login error:', error)
+                this.showToast('Failed to load demo user', 'error')
+            }
             }
 
             async handleLogout() {
@@ -967,12 +915,26 @@
                 }
             }
 
-            loadDashboard() {
-                // Update stats with demo data
-                document.getElementById('totalCustomers').textContent = this.demoData.customers.length
-                document.getElementById('activeLoans').textContent = '89'
-                document.getElementById('outstandingAmount').textContent = '₹2,45,678'
-                document.getElementById('todayCollections').textContent = '₹45,230'
+            async loadDashboard() {
+                try {
+                    if (!window.dataService) {
+                        throw new Error('Data service not initialized')
+                    }
+                    
+                    const statsResult = await window.dataService.getDashboardStats()
+                    if (statsResult.success) {
+                        const stats = statsResult.data
+                        document.getElementById('totalCustomers').textContent = stats.totalCustomers
+                        document.getElementById('activeLoans').textContent = stats.activeLoans
+                        document.getElementById('outstandingAmount').textContent = `₹${stats.outstandingAmount.toLocaleString()}`
+                        document.getElementById('todayCollections').textContent = `₹${stats.collectedToday.toLocaleString()}`
+                    } else {
+                        throw new Error(statsResult.error || 'Failed to load dashboard stats')
+                    }
+                } catch (error) {
+                    console.error('Dashboard load error:', error)
+                    this.showToast('Failed to load dashboard data', 'error')
+                }
             }
 
             loadWhatsAppPage() {
@@ -1101,15 +1063,15 @@
             showToast(message, type = 'info') {
                 const toast = document.createElement('div')
                 toast.className = `bg-white border-l-4 shadow-lg rounded p-4 mb-2 ${
-                    type === 'success' ? 'border-green-500' : 
+                    type === 'success' ? 'border-green-500' :
                     type === 'error' ? 'border-red-500' : 'border-blue-500'
                 }`
                 
                 toast.innerHTML = `
                     <div class="flex items-center">
                         <i class="fas ${
-                            type === 'success' ? 'fa-check-circle text-green-500' : 
-                            type === 'error' ? 'fa-exclamation-circle text-red-500' : 
+                            type === 'success' ? 'fa-check-circle text-green-500' :
+                            type === 'error' ? 'fa-exclamation-circle text-red-500' :
                             'fa-info-circle text-blue-500'
                         } mr-2"></i>
                         <span class="text-gray-800">${message}</span>
@@ -1127,6 +1089,277 @@
                     }
                 }, 5000)
             }
+            
+            // ========== PDF Generation Methods ==========
+            
+            /**
+             * Generates a Loan Agreement PDF document
+             * @param {Object} loanData - Loan data object
+             * @returns {jsPDF} jsPDF instance
+             */
+            generateLoanAgreementPDF(loanData) {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: "a4"
+                });
+
+                // Add watermark
+                this.addWatermark(pdf);
+
+                // Set initial position
+                let yPos = 20;
+
+                // Add header
+                pdf.setFontSize(20);
+                pdf.setFont(undefined, 'bold');
+                pdf.text("LOAN AGREEMENT", pdf.internal.pageSize.getWidth() / 2, yPos, { align: "center" });
+                yPos += 15;
+
+                // Add customer details
+                yPos = this.addCustomerDetails(pdf, loanData, yPos);
+
+                // Add loan terms
+                yPos = this.addLoanTerms(pdf, loanData, yPos + 10);
+
+                // Add EMI schedule
+                yPos = this.addEMISchedule(pdf, loanData, yPos + 10);
+
+                // Add signature section
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'normal');
+                pdf.text("Borrower Signature: ________________________", 20, yPos + 20);
+                pdf.text("Lender Signature: ________________________", 20, yPos + 30);
+                pdf.text("Date: ________________________", 20, yPos + 40);
+
+                return pdf;
+            }
+
+            /**
+             * Generates a Loan Card PDF document (compact format)
+             * @param {Object} loanData - Loan data object
+             * @returns {jsPDF} jsPDF instance
+             */
+            generateLoanCardPDF(loanData) {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: "portrait",
+                    unit: "mm",
+                    format: [86, 54] // ID card size
+                });
+
+                // Add watermark
+                this.addWatermark(pdf, 15);
+
+                // Set initial position
+                let yPos = 5;
+
+                // Add header
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                pdf.text("JLS FINANCE LTD", 43, yPos, { align: "center" });
+                yPos += 5;
+
+                // Add customer photo if available
+                if (loanData.customer.photo) {
+                    try {
+                        const img = new Image();
+                        img.src = loanData.customer.photo;
+                        pdf.addImage(img, 'JPEG', 15, yPos, 20, 20);
+                    } catch (e) {
+                        console.error('Error adding customer photo:', e);
+                    }
+                    yPos += 25;
+                } else {
+                    yPos += 5;
+                }
+
+                // Add customer details
+                pdf.setFontSize(10);
+                pdf.setFont(undefined, 'normal');
+                pdf.text(`Name: ${loanData.customer.name}`, 10, yPos);
+                yPos += 5;
+                pdf.text(`ID: ${loanData.customer.id}`, 10, yPos);
+                yPos += 5;
+                pdf.text(`Loan: ₹${loanData.amount}`, 10, yPos);
+                yPos += 5;
+                pdf.text(`EMI: ₹${loanData.emiAmount}/month`, 10, yPos);
+                yPos += 5;
+                pdf.text(`Due: ${loanData.nextDueDate}`, 10, yPos);
+
+                return pdf;
+            }
+
+            /**
+             * Adds watermark to PDF document
+             * @param {jsPDF} pdf - jsPDF instance
+             * @param {number} opacity - Watermark opacity (0-1)
+             */
+            addWatermark(pdf, opacity = 0.1) {
+                const watermarkText = "JLS FINANCE LTD";
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                
+                pdf.setFontSize(48);
+                pdf.setTextColor(200, 200, 200);
+                pdf.setGState(new pdf.GState({ opacity: opacity }));
+                
+                // Calculate text width to center
+                const textWidth = pdf.getTextWidth(watermarkText);
+                const x = (pageWidth - textWidth) / 2;
+                const y = pageHeight / 2;
+                
+                // Rotate 45 degrees and center
+                pdf.text(watermarkText, x, y, { angle: 45 });
+                
+                // Reset graphics state
+                pdf.setGState(new pdf.GState({ opacity: 1 }));
+                pdf.setTextColor(0, 0, 0);
+            }
+
+            /**
+             * Adds customer details to PDF
+             * @param {jsPDF} pdf - jsPDF instance
+             * @param {Object} loanData - Loan data object
+             * @param {number} yPos - Vertical start position
+             * @returns {number} New vertical position after this section
+             */
+            addCustomerDetails(pdf, loanData, yPos) {
+                const customer = loanData.customer;
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                pdf.text("Customer Details:", 20, yPos);
+                yPos += 7;
+
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'normal');
+                pdf.text(`Name: ${customer.name}`, 20, yPos);
+                yPos += 7;
+
+                // Add customer photo if available
+                if (customer.photo) {
+                    try {
+                        const img = new Image();
+                        img.src = customer.photo;
+                        pdf.addImage(img, 'JPEG', 140, yPos - 15, 30, 30);
+                    } catch (e) {
+                        console.error('Error adding customer photo:', e);
+                    }
+                }
+
+                pdf.text(`Phone: ${customer.phone}`, 20, yPos + 7);
+                pdf.text(`Address: ${customer.address}`, 20, yPos + 14);
+                return yPos + 21;
+            }
+
+            /**
+             * Adds loan terms to PDF
+             * @param {jsPDF} pdf - jsPDF instance
+             * @param {Object} loanData - Loan data object
+             * @param {number} yPos - Vertical start position
+             * @returns {number} New vertical position after this section
+             */
+            addLoanTerms(pdf, loanData, yPos) {
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                pdf.text("Loan Terms:", 20, yPos);
+                yPos += 7;
+
+                pdf.setFontSize(12);
+                pdf.setFont(undefined, 'normal');
+                pdf.text(`Loan Amount: ₹${loanData.amount}`, 20, yPos);
+                yPos += 7;
+                pdf.text(`Interest Rate: ${loanData.interestRate}%`, 20, yPos);
+                yPos += 7;
+                pdf.text(`Tenure: ${loanData.tenure} months`, 20, yPos);
+                yPos += 7;
+                pdf.text(`Disbursal Date: ${loanData.disbursalDate}`, 20, yPos);
+                yPos += 7;
+                pdf.text(`EMI Amount: ₹${loanData.emiAmount}`, 20, yPos);
+                yPos += 7;
+                return yPos;
+            }
+
+            /**
+             * Adds EMI schedule table to PDF
+             * @param {jsPDF} pdf - jsPDF instance
+             * @param {Object} loanData - Loan data object
+             * @param {number} yPos - Vertical start position
+             * @returns {number} New vertical position after this section
+             */
+            addEMISchedule(pdf, loanData, yPos) {
+                pdf.setFontSize(14);
+                pdf.setFont(undefined, 'bold');
+                pdf.text("EMI Payment Schedule:", 20, yPos);
+                yPos += 7;
+
+                pdf.setFontSize(10);
+                const headers = ["Due Date", "Principal", "Interest", "Total", "Balance"];
+                const colWidths = [30, 25, 25, 25, 25];
+                const colPositions = [20, 50, 75, 100, 125];
+
+                // Draw table headers
+                pdf.setFillColor(200, 200, 200);
+                pdf.rect(20, yPos, 150, 7, 'F');
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFont(undefined, 'bold');
+                for (let i = 0; i < headers.length; i++) {
+                    pdf.text(headers[i], colPositions[i], yPos + 5);
+                }
+                yPos += 7;
+
+                // Draw table rows
+                pdf.setFont(undefined, 'normal');
+                for (const emi of loanData.emiSchedule) {
+                    if (yPos > 280) { // Check if near bottom of page
+                        pdf.addPage();
+                        yPos = 20;
+                    }
+                    const rowData = [
+                        emi.dueDate,
+                        `₹${emi.principal}`,
+                        `₹${emi.interest}`,
+                        `₹${emi.total}`,
+                        `₹${emi.balance}`
+                    ];
+                    for (let i = 0; i < rowData.length; i++) {
+                        pdf.text(rowData[i], colPositions[i], yPos + 5);
+                    }
+                    yPos += 7;
+                }
+                return yPos;
+            }
+            
+            /**
+             * Demo function to get loan data
+             * @returns {Object} Loan data object
+             */
+            getDemoLoanData() {
+                return {
+                    id: 'L001',
+                    amount: 50000,
+                    interestRate: 12,
+                    tenure: 12,
+                    disbursalDate: '2023-07-19',
+                    emiAmount: 4442.44,
+                    nextDueDate: '2023-08-19',
+                    customer: {
+                        id: 'C001',
+                        name: 'राहुल शर्मा',
+                        phone: '+91-9876543210',
+                        address: '123, Main Street, Mumbai',
+                        photo: localStorage.getItem('customerPhoto') || '' // Get from localStorage
+                    },
+                    emiSchedule: Array.from({ length: 12 }, (_, i) => ({
+                        dueDate: `2023-${(i+7).toString().padStart(2, '0')}-19`,
+                        principal: (4166.67).toFixed(2),
+                        interest: (275.77).toFixed(2),
+                        total: (4442.44).toFixed(2),
+                        balance: (50000 - (4166.67 * (i+1))).toFixed(2)
+                    }))
+                };
+            }
         }
 
         // Initialize Enhanced Application
@@ -1137,8 +1370,58 @@
             window.app = app
             
             console.log('Enhanced JLS Finance App initialized successfully!')
+            
+            // Setup loan document buttons
+            document.getElementById('generateAgreementBtn')?.addEventListener('click', () => {
+                try {
+                    const loanData = app.getDemoLoanData();
+                    const pdf = app.generateLoanAgreementPDF(loanData);
+                    const pdfBlob = pdf.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    
+                    document.getElementById('pdfPreview').src = pdfUrl;
+                    document.getElementById('pdfPreviewContainer').classList.remove('hidden');
+                    
+                    // Set up download button
+                    document.getElementById('downloadPdfBtn').onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = pdfUrl;
+                        a.download = `Loan-Agreement-${loanData.id}.pdf`;
+                        a.click();
+                    };
+                } catch (error) {
+                    console.error('Error generating loan agreement:', error);
+                    app.showToast('Failed to generate loan agreement. Please try again.', 'error');
+                }
+            });
+            
+            document.getElementById('generateCardBtn')?.addEventListener('click', () => {
+                try {
+                    const loanData = app.getDemoLoanData();
+                    const pdf = app.generateLoanCardPDF(loanData);
+                    const pdfBlob = pdf.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    
+                    document.getElementById('pdfPreview').src = pdfUrl;
+                    document.getElementById('pdfPreviewContainer').classList.remove('hidden');
+                    
+                    // Set up download button
+                    document.getElementById('downloadPdfBtn').onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = pdfUrl;
+                        a.download = `Loan-Card-${loanData.id}.pdf`;
+                        a.click();
+                    };
+                } catch (error) {
+                    console.error('Error generating loan card:', error);
+                    app.showToast('Failed to generate loan card. Please try again.', 'error');
+                }
+            });
+            
+            document.getElementById('newDocumentBtn')?.addEventListener('click', () => {
+                document.getElementById('pdfPreviewContainer').classList.add('hidden');
+            });
         })
     </script>
 </body>
 </html>
-
